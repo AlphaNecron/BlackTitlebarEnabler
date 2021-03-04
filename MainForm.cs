@@ -10,6 +10,7 @@ namespace BlackTitlebar
     public partial class MainForm : Form
     {
         private const long Black = 0xF000000;
+        private const long Fallback = 0x2A9DF4;
         private const int ColoredTitlebar = 0x1;
         private const int WhiteTitlebar = 0x0;
         private const string KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\DWM";
@@ -23,7 +24,7 @@ namespace BlackTitlebar
 
         private readonly PictureBox _imgGitHub = new()
         {
-            Size = new Size(20, 20),
+            Size = new Size(16, 16)
         };
 
         private readonly CommandLinkButton _btnEnableBtb = new()
@@ -47,18 +48,19 @@ namespace BlackTitlebar
             InitializeEvents();
         }
         
-        private static bool GetStatus()
+        private static bool GetStatus(out long accentColor)
         {
-            var colorPrevalence = Convert.ToInt16(Registry.GetValue(KeyPath, "ColorPrevalence", -1));
-            var activeColor = long.Parse(Registry.GetValue(KeyPath, "AccentColor", -1)?.ToString()!);
-            var isTitlebarBlack = (colorPrevalence == ColoredTitlebar && activeColor == Black);
+            var colorPrevalence = int.Parse(Registry.GetValue(KeyPath, "ColorPrevalence", -1)?.ToString()!);
+            var activeAccentColor = accentColor = long.Parse(Registry.GetValue(KeyPath, "AccentColor", -1)?.ToString()!);
+            var isTitlebarBlack = (colorPrevalence == ColoredTitlebar && activeAccentColor == Black);
             return isTitlebarBlack;
         }
 
         private void InitializeEvents()
         {
             _btnEnableBtb.Click += (_, _) => EnableBlackTitlebar();
-            _btnDisableBtb.Click += (_, _) => DisableBlackTitlebar(); 
+            _btnDisableBtb.Click += (_, _) => DisableBlackTitlebar();
+            this.Activated += (_, _) => UpdateStatus();
             _imgGitHub.Click += (_, _) => Process.Start(new ProcessStartInfo
             {
                 UseShellExecute = true,
@@ -72,10 +74,9 @@ namespace BlackTitlebar
             _btnEnableBtb.Location = new Point(20, 20 + _btnDisableBtb.Height);
             _imgGitHub.BackgroundImageLayout = ImageLayout.Stretch;
             _imgGitHub.BackgroundImage = (Image) ResourceManager.GetObject("imgGitHub"); 
-            _imgGitHub.Location = new Point(_bottomPanel.Width + this.Width / 6, 10);
-            _labelStatus.Location = new Point(10, 10);
-            _labelStatus.Text = $@"Black Titlebar: {(GetStatus() ? "Enabled" : "Disabled")}";
-            _labelStatus.Width = 150;
+            _imgGitHub.Location = new Point(_bottomPanel.Width + _imgGitHub.Width * 3 + 12, 15);
+            _labelStatus.Location = new Point(5, 15);
+            _labelStatus.Width = this.Width - _imgGitHub.Width * 3;
             _bottomPanel.Controls.Add(_imgGitHub);
             _bottomPanel.Controls.Add(_labelStatus);
             this.Controls.Add(_bottomPanel);
@@ -87,6 +88,8 @@ namespace BlackTitlebar
         {
             try
             {
+                SetAccentColor(Fallback);
+                SetInactiveAccentColor(Fallback);
                 SetColorPrevalence(false);
             }
             catch (Exception ex)
@@ -95,14 +98,25 @@ namespace BlackTitlebar
             }
             finally
             {
-                UpdateStatus();
+                UpdateStatus(true);
             }
         }
 
-        private static void UpdateStatus()
+        private static void UpdateStatus(bool showMsg = false)
         {
-            var status = _labelStatus.Text = $@"Black Titlebar: {(GetStatus() ? "Enabled" : "Disabled")}";
-            MessageBox.Show(status);
+            var status = GetStatus(out var accentColor) ? "Enabled" : "Disabled";
+             _labelStatus.Text = $@"Black Titlebar: {status} (#{accentColor:X})";
+            if (showMsg) MessageBox.Show($@"Black Titlebar: {status}");
+        }
+
+        private static void SetAccentColor(long hex)
+        {
+            Registry.SetValue(KeyPath, "AccentColor", hex, RegistryValueKind.DWord);
+        }
+
+        private static void SetInactiveAccentColor(long hex)
+        {
+            Registry.SetValue(KeyPath, "AccentColorInactive", hex, RegistryValueKind.DWord);
         }
 
         private static void SetColorPrevalence(bool enable)
@@ -114,9 +128,9 @@ namespace BlackTitlebar
         {
             try
             {
+                SetAccentColor(Black);
+                SetInactiveAccentColor(Black);
                 SetColorPrevalence(true);
-                Registry.SetValue(KeyPath, "AccentColor", Black, RegistryValueKind.DWord);
-                Registry.SetValue(KeyPath, "AccentColorInactive", Black, RegistryValueKind.DWord);
             }
             catch (Exception ex)
             {
@@ -124,7 +138,7 @@ namespace BlackTitlebar
             }
             finally
             {
-               UpdateStatus();
+               UpdateStatus(true);
             }
         }
     }

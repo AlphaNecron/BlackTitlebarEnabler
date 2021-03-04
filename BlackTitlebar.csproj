@@ -1,10 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net5.0-windows</TargetFramework>
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationManifest>app.manifest</ApplicationManifest>
+<!--        <PublishSingleFile>true</PublishSingleFile>-->
+<!--        <SelfContained>true</SelfContained>-->
+        <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+        <RuntimeIdentifiers>win10-x86;win10-x64</RuntimeIdentifiers>
+        <AssemblyVersion>1.0.0.1</AssemblyVersion>
+        <FileVersion>1.0.0.1</FileVersion>
+        <NeutralLanguage>en-US</NeutralLanguage>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,4 +26,14 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Costura.Fody" Version="5.0.2">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Fody" Version="6.3.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; compile; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
 </Project>
