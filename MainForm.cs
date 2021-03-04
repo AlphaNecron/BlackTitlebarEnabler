@@ -9,7 +9,7 @@ namespace BlackTitlebar
 {
     public partial class MainForm : Form
     {
-        private const long Black = 0xFF00000;
+        private const long Black = 0xF000000;
         private const int ColoredTitlebar = 0x1;
         private const int WhiteTitlebar = 0x0;
         private const string KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\DWM";
@@ -38,7 +38,7 @@ namespace BlackTitlebar
             Height = 35
         };
 
-        private readonly Label _labelStatus = new();
+        private static readonly Label _labelStatus = new();
 
         public MainForm()
         {
@@ -95,8 +95,14 @@ namespace BlackTitlebar
             }
             finally
             {
-                MessageBox.Show($@"Status: {(GetStatus() ? "Enabled" : "Disabled")}");
+                UpdateStatus();
             }
+        }
+
+        private static void UpdateStatus()
+        {
+            var status = _labelStatus.Text = $@"Black Titlebar: {(GetStatus() ? "Enabled" : "Disabled")}";
+            MessageBox.Show(status);
         }
 
         private static void SetColorPrevalence(bool enable)
@@ -118,7 +124,7 @@ namespace BlackTitlebar
             }
             finally
             {
-                MessageBox.Show($@"Status: {(GetStatus() ? "Enabled" : "Disabled")}");
+               UpdateStatus();
             }
         }
     }
