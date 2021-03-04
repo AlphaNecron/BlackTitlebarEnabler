@@ -1,6 +1,8 @@
-﻿namespace BlackTitlebar
+﻿using System.Windows.Forms;
+
+namespace BlackTitlebar
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -24,15 +26,23 @@
         #region Windows Form Designer generated code
 
         /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            this.SuspendLayout();
+            // 
+            // MainForm
+            // 
+            this.ClientSize = new System.Drawing.Size(284, 161);
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(300, 200);
+            this.MinimumSize = new System.Drawing.Size(300, 200);
+            this.Name = "MainForm";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.Text = "Black Titlebar";
+            this.ResumeLayout(false);
         }
 
         #endregion

@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.AccessControl;
 using System.Windows.Forms;
+using static Microsoft.Win32.Registry;
 
 namespace BlackTitlebar
 {
@@ -14,10 +13,20 @@ namespace BlackTitlebar
         [STAThread]
         static void Main()
         {
-            Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
+            if (!IsWin10)
+            {
+                MessageBox.Show(@"Windows 10 is required, quitting.", "", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+                Application.Exit();
+            }
+            Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new MainForm());
         }
+
+        private static bool IsWin10 =>
+            LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion",
+                    RegistryRights.ReadKey)
+                .GetValue("ProductName").ToString().Contains("Windows 10");
     }
 }
